@@ -16,17 +16,10 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "gl-matrix.h"
-
 #define TARGET_WIDTH (1920)
 #define TARGET_HEIGHT (1080)
 
-GX2VertexShader *vertexShader;
-GX2PixelShader *pixelShader;
-GX2FetchShader *fetchShader;
-GX2AttribStream *attributes;
-void *fetchShaderProgramm;
-mat4_t projectionMtx;
+WHBGfxShaderGroup shaderGroup;
 
 void clean_tex_allocs();
 void render_texture_partial_color(GX2Texture *render_texture, float x_pos, float y_pos, float width, float height, int partial_x, int partial_y, int partial_width, int partial_height, float r, float g, float b, float a);

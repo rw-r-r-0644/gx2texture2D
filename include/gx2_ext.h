@@ -13,14 +13,7 @@
 #define GX2_COMP_SEL_WZYX                               0x03020100
 #define GX2_COMP_SEL_WXYZ                               0x03000102
 
-static const u32 attribute_dest_comp_selector[20] = {
-    GX2_COMP_SEL_X001, GX2_COMP_SEL_XY01, GX2_COMP_SEL_X001, GX2_COMP_SEL_X001,  GX2_COMP_SEL_XY01, GX2_COMP_SEL_X001,
-    GX2_COMP_SEL_X001, GX2_COMP_SEL_XY01, GX2_COMP_SEL_XY01, GX2_COMP_SEL_XYZ1, GX2_COMP_SEL_XYZW, GX2_COMP_SEL_XYZW,
-    GX2_COMP_SEL_XY01, GX2_COMP_SEL_XY01, GX2_COMP_SEL_XYZW, GX2_COMP_SEL_XYZW, GX2_COMP_SEL_XYZ1, GX2_COMP_SEL_XYZ1,
-    GX2_COMP_SEL_XYZW, GX2_COMP_SEL_XYZW
-};
-
-static const u32 texture_comp_selector[54] = {
+static const uint32_t texture_comp_selector[54] = {
     GX2_COMP_SEL_NONE, GX2_COMP_SEL_X001, GX2_COMP_SEL_XY01, GX2_COMP_SEL_NONE, GX2_COMP_SEL_NONE, GX2_COMP_SEL_X001,
     GX2_COMP_SEL_X001, GX2_COMP_SEL_XY01, GX2_COMP_SEL_XYZ1, GX2_COMP_SEL_XYZ1, GX2_COMP_SEL_XYZW, GX2_COMP_SEL_XYZW,
     GX2_COMP_SEL_WZYX, GX2_COMP_SEL_X001, GX2_COMP_SEL_X001, GX2_COMP_SEL_XY01, GX2_COMP_SEL_XY01, GX2_COMP_SEL_NONE,
@@ -32,75 +25,7 @@ static const u32 texture_comp_selector[54] = {
     GX2_COMP_SEL_XYZ1, GX2_COMP_SEL_XYZW, GX2_COMP_SEL_XYZW, GX2_COMP_SEL_XYZW, GX2_COMP_SEL_X001, GX2_COMP_SEL_XY01
 };
 
-static inline void GX2InitAttribStream(GX2AttribStream* attr, u32 location, u32 buffer, u32 offset, s32 format)
-{
-    attr->location = location;
-    attr->buffer = buffer;
-    attr->offset = offset;
-    attr->format = format;
-    attr->type = 0;
-    attr->aluDivisor = 0;
-    attr->mask = attribute_dest_comp_selector[format & 0xff]; //TODO: eww
-    attr->endianSwap  = GX2_ENDIAN_SWAP_DEFAULT;
-}
-
-static inline void GX2InitDepthBuffer(GX2DepthBuffer *depthBuffer, s32 dim, u32 width, u32 height, u32 depth, s32 format, s32 aa)
-{
-    depthBuffer->surface.dim = dim;
-    depthBuffer->surface.width = width;
-    depthBuffer->surface.height = height;
-    depthBuffer->surface.depth = depth;
-    depthBuffer->surface.mipLevels = 1;
-    depthBuffer->surface.format = format;
-    depthBuffer->surface.aa = aa;
-    depthBuffer->surface.use = ((format==GX2_SURFACE_FORMAT_UNORM_R24_X8) || (format==GX2_SURFACE_FORMAT_FLOAT_D24_S8)) ? GX2_SURFACE_USE_DEPTH_BUFFER : (GX2_SURFACE_USE_DEPTH_BUFFER | GX2_SURFACE_USE_TEXTURE);
-    depthBuffer->surface.tileMode = GX2_TILE_MODE_DEFAULT;
-    depthBuffer->surface.swizzle  = 0;
-    depthBuffer->viewMip = 0;
-    depthBuffer->viewFirstSlice = 0;
-    depthBuffer->viewNumSlices = depth;
-    depthBuffer->depthClear = 1.0f;
-    depthBuffer->stencilClear = 0;
-    depthBuffer->hiZPtr = NULL;
-    depthBuffer->hiZSize = 0;
-    GX2CalcSurfaceSizeAndAlignment(&depthBuffer->surface);
-    GX2InitDepthBufferRegs(depthBuffer);
-}
-
-static inline void GX2InitColorBuffer(GX2ColorBuffer *colorBuffer, s32 dim, u32 width, u32 height, u32 depth, s32 format, s32 aa)
-{
-    colorBuffer->surface.dim = dim;
-    colorBuffer->surface.width = width;
-    colorBuffer->surface.height = height;
-    colorBuffer->surface.depth = depth;
-    colorBuffer->surface.mipLevels = 1;
-    colorBuffer->surface.format = format;
-    colorBuffer->surface.aa = aa;
-    colorBuffer->surface.use = GX2_SURFACE_USE_COLOR_BUFFER | 0x80000000;
-    colorBuffer->surface.imageSize = 0;
-    colorBuffer->surface.image = NULL;
-    colorBuffer->surface.mipmapSize = 0;
-    colorBuffer->surface.mipmaps = NULL;
-    colorBuffer->surface.tileMode = GX2_TILE_MODE_DEFAULT;
-    colorBuffer->surface.swizzle = 0;
-    colorBuffer->surface.alignment = 0;
-    colorBuffer->surface.pitch = 0;
-    u32 i;
-    for(i = 0; i < 13; i++)
-        colorBuffer->surface.mipLevelOffset[i] = 0;
-    colorBuffer->viewMip = 0;
-    colorBuffer->viewFirstSlice = 0;
-    colorBuffer->viewNumSlices = depth;
-    colorBuffer->aaBuffer = NULL;
-    colorBuffer->aaSize = 0;
-    for(i = 0; i < 5; i++)
-        colorBuffer->regs[i] = 0;
-
-    GX2CalcSurfaceSizeAndAlignment(&colorBuffer->surface);
-    GX2InitColorBufferRegs(colorBuffer);
-}
-
-static inline void GX2InitTexture(GX2Texture *tex, u32 width, u32 height, u32 depth, u32 mipLevels, s32 format, s32 dim, s32 tile)
+static inline void GX2InitTexture(GX2Texture *tex, uint32_t width, uint32_t height, uint32_t depth, uint32_t mipLevels, int32_t format, int32_t dim, int32_t tile)
 {
     tex->surface.dim = dim;
     tex->surface.width = width;
@@ -118,7 +43,7 @@ static inline void GX2InitTexture(GX2Texture *tex, u32 width, u32 height, u32 de
     tex->surface.swizzle = 0;
     tex->surface.alignment = 0;
     tex->surface.pitch = 0;
-    u32 i;
+    uint32_t i;
     for(i = 0; i < 13; i++)
         tex->surface.mipLevelOffset[i] = 0;
     tex->viewFirstMip = 0;

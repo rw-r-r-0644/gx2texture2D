@@ -1,11 +1,7 @@
+#include <stdint.h>
+#include <stdbool.h>
+#include <whb/gfx.h>
 #include "draw.h"
-
-GX2VertexShader *vertexShader = NULL;
-GX2PixelShader *pixelShader = NULL;
-GX2FetchShader *fetchShader = NULL;
-GX2AttribStream *attributes = NULL;
-void *fetchShaderProgramm;
-mat4_t projectionMtx;
 
 bool sampler_init = false;
 GX2Sampler sampler;
@@ -37,7 +33,7 @@ void render_texture_partial_color(GX2Texture *render_texture, float x_pos, float
 
     if(!sampler_init)
     {
-        GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP , GX2_TEX_XY_FILLTER_MODE_LINEAR);
+        GX2InitSampler(&sampler, GX2_TEX_CLAMP_MODE_CLAMP , GX2_TEX_XY_FILTER_MODE_LINEAR);
         sampler_init = true;
     }
 
@@ -49,9 +45,9 @@ void render_texture_partial_color(GX2Texture *render_texture, float x_pos, float
     float tex_y_min = (float)partial_y / (float)total_height;
     float tex_y_max = (float)(partial_y + partial_height) / (float)total_height;
 
-    GX2SetFetchShader(fetchShader);
-    GX2SetVertexShader(vertexShader);
-    GX2SetPixelShader(pixelShader);
+	GX2SetFetchShader(&shaderGroup.fetchShader);
+	GX2SetVertexShader(shaderGroup.vertexShader);
+	GX2SetPixelShader(shaderGroup.pixelShader);
     
     GX2SetPixelTexture(render_texture, 0);
     GX2SetPixelSampler(&sampler, 0);
@@ -67,7 +63,6 @@ void render_texture_partial_color(GX2Texture *render_texture, float x_pos, float
          tex_x_min, tex_y_max,
          tex_x_min, tex_y_min,
          tex_x_max, tex_y_max,
-         
          tex_x_max, tex_y_min,
     };
 
@@ -105,10 +100,9 @@ void render_texture_partial_color(GX2Texture *render_texture, float x_pos, float
     
     unsigned int vtxCount = sizeof(g_vertex_buffer_data_temp) / (sizeof(float) * 3);
     
-    GX2SetAttribBuffer(2, sizeof(g_color_buffer_data_temp), sizeof(f32) * 4, g_color_buffer_data);
-    GX2SetAttribBuffer(1, sizeof(g_tex_buffer_data_temp), sizeof(f32) * 2, g_tex_buffer_data);
-    GX2SetAttribBuffer(0, sizeof(g_vertex_buffer_data_temp), sizeof(f32) * 3, g_vertex_buffer_data);
-    GX2SetVertexUniformReg(vertexShader->uniformVars[0].offset, 16, (uint32_t*)projectionMtx);
+    GX2SetAttribBuffer(2, sizeof(g_color_buffer_data_temp), sizeof(float) * 4, g_color_buffer_data);
+    GX2SetAttribBuffer(1, sizeof(g_tex_buffer_data_temp), sizeof(float) * 2, g_tex_buffer_data);
+    GX2SetAttribBuffer(0, sizeof(g_vertex_buffer_data_temp), sizeof(float) * 3, g_vertex_buffer_data);
 
     GX2DrawEx(GX2_PRIMITIVE_MODE_TRIANGLE_STRIP, vtxCount, 0, 1);
 }

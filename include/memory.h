@@ -22,18 +22,27 @@ extern "C" {
 #endif
 
 #include <malloc.h>
+#include <stdio.h>
+#include <stdint.h>
 
-void memoryInitialize(void);
-void memoryRelease(void);
-
-void * MEM2_alloc(unsigned int size, unsigned int align);
-void MEM2_free(void *ptr);
-
-void * MEM1_alloc(unsigned int size, unsigned int align);
-void MEM1_free(void *ptr);
-
-void * MEMBucket_alloc(unsigned int size, unsigned int align);
-void MEMBucket_free(void *ptr);
+static inline void *read_file_to_bytes(char *path)
+{
+    FILE *load_file = fopen(path, "rb");
+   
+    if(!load_file) return NULL;
+   
+    fseek(load_file, 0, SEEK_END);
+    uint32_t size = ftell(load_file);
+    rewind(load_file);
+   
+    void *data = malloc(size);
+    if(!data) return NULL;
+   
+    fread(data, size, sizeof(uint8_t), load_file);
+    fclose(load_file);
+    
+    return data;
+}
 
 #ifdef __cplusplus
 }
