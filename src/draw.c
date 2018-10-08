@@ -45,9 +45,9 @@ void render_texture_partial_color(GX2Texture *render_texture, float x_pos, float
     float tex_y_min = (float)partial_y / (float)total_height;
     float tex_y_max = (float)(partial_y + partial_height) / (float)total_height;
 
-	GX2SetFetchShader(&shaderGroup.fetchShader);
-	GX2SetVertexShader(shaderGroup.vertexShader);
-	GX2SetPixelShader(shaderGroup.pixelShader);
+    GX2SetFetchShader(&shaderGroup.fetchShader);
+    GX2SetVertexShader(shaderGroup.vertexShader);
+    GX2SetPixelShader(shaderGroup.pixelShader);
     
     GX2SetPixelTexture(render_texture, 0);
     GX2SetPixelSampler(&sampler, 0);
@@ -60,19 +60,18 @@ void render_texture_partial_color(GX2Texture *render_texture, float x_pos, float
     
     float g_tex_buffer_data_temp[] =
     {
-         tex_x_min, tex_y_max,
-         tex_x_min, tex_y_min,
-         tex_x_max, tex_y_max,
-         tex_x_max, tex_y_min,
+        tex_x_min, tex_y_max,
+        tex_x_max, tex_y_max,
+        tex_x_max, tex_y_min,
+        tex_x_min, tex_y_min,
     };
 
     float g_vertex_buffer_data_temp[] =
     {
-         transform_x, transform_y, 0.0f,
-         transform_x, transform_y+transform_height, 0.0f,
-         transform_x+transform_width, transform_y, 0.0f,
-         
-         transform_x+transform_width, transform_y+transform_height, 0.0f,
+        transform_x, transform_y, 0.0f,
+        transform_x + transform_width, transform_y, 0.0f,
+        transform_x + transform_width, transform_y + transform_height, 0.0f,
+        transform_x, transform_y + transform_height, 0.0f,
     };
     
     float g_color_buffer_data_temp[] = 
@@ -104,7 +103,7 @@ void render_texture_partial_color(GX2Texture *render_texture, float x_pos, float
     GX2SetAttribBuffer(1, sizeof(g_tex_buffer_data_temp), sizeof(float) * 2, g_tex_buffer_data);
     GX2SetAttribBuffer(0, sizeof(g_vertex_buffer_data_temp), sizeof(float) * 3, g_vertex_buffer_data);
 
-    GX2DrawEx(GX2_PRIMITIVE_MODE_TRIANGLE_STRIP, vtxCount, 0, 1);
+    GX2DrawEx(GX2_PRIMITIVE_MODE_QUADS, vtxCount, 0, 1);
 }
 
 void render_texture_partial(GX2Texture *render_texture, float x_pos, float y_pos, float width, float height, int partial_x, int partial_y, int partial_width, int partial_height)
