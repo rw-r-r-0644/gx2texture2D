@@ -11,20 +11,19 @@ TARGET		:=	gx2TextureShader
 SOURCES		:=	src src/matrix
 INCLUDES	:=	-Iinclude
 ROMFS		:=	romfs
+include $(WUT_ROOT)/share/romfs-wiiu.mk
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
 CFLAGS		+=	-O2 -Wall -std=c11 $(INCLUDES)
 CXXFLAGS	+=	-O2 -Wall $(INCLUDES)
-LDFLAGS		+=	$(WUT_NEWLIB_LDFLAGS) $(WUT_STDCPP_LDFLAGS) $(WUT_DEVOPTAB_LDFLAGS) \
-				-lm -lcoreinit -lgx2 -lproc_ui -lsysapp -lwhb -lgfd -lromfs-wiiu
-
+LDFLAGS		+=	$(WUT_NEWLIB_LDFLAGS) $(WUT_STDCPP_LDFLAGS) $(WUT_DEVOPTAB_LDFLAGS) $(ROMFS_LDFLAGS) \
+				-lm -lcoreinit -lgx2 -lproc_ui -lsysapp -lwhb -lgfd
 
 #---------------------------------------------------------------------------------
 # get a list of objects
 #---------------------------------------------------------------------------------
-include $(DEVKITPRO)/portlibs/ppc/share/romfs-wiiu.mk
 CFILES		:=	$(foreach dir,$(SOURCES),$(wildcard $(dir)/*.c))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(wildcard $(dir)/*.cpp))
 SFILES		:=	$(foreach dir,$(SOURCES),$(wildcard $(dir)/*.s))
@@ -43,11 +42,3 @@ clean:
 # wut
 #---------------------------------------------------------------------------------
 include $(WUT_ROOT)/share/wut.mk
-
-#---------------------------------------------------------------------------------
-# portlibs
-#---------------------------------------------------------------------------------
-PORTLIBS	:=	$(DEVKITPRO)/portlibs/ppc
-LDFLAGS		+=	-L$(PORTLIBS)/lib
-CFLAGS		+=	-I$(PORTLIBS)/include -I$(PORTLIBS)/include/SDL2
-CXXFLAGS	+=	-I$(PORTLIBS)/include -I$(PORTLIBS)/include/SDL2
